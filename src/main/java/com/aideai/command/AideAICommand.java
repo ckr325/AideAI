@@ -71,6 +71,20 @@ public class AideAICommand {
                     return 1;
                 })
             )
+            .then(Commands.literal("summon")
+                .executes(ctx -> {
+                    CommandSourceStack source = ctx.getSource();
+                    if (source.getEntity() instanceof ServerPlayer) {
+                        ServerPlayer player = (ServerPlayer) source.getEntity();
+                        com.aideai.AideAI.AIDEAI_ENTITY.get().spawn(
+                            player.serverLevel(),
+                            player.blockPosition(),
+                            net.minecraft.world.entity.MobSpawnType.COMMAND);
+                        source.sendSuccess(() -> Component.literal("[AideAI] Summoned!"), true);
+                    }
+                    return 1;
+                })
+            )
             .then(Commands.literal("help")
                 .executes(ctx -> {
                     ctx.getSource().sendSuccess(() -> Component.literal(
@@ -79,6 +93,7 @@ public class AideAICommand {
                         "/aideai setkey <key>  - Set API Key\n" +
                         "/aideai seturl <url>  - Set API URL\n" +
                         "/aideai toggle        - Toggle auto chat\n" +
+                        "/aideai summon        - Summon AideAI NPC\n" +
                         "/aideai help          - Show this help"
                     ), false);
                     return 1;

@@ -2,14 +2,15 @@ package com.aideai.event;
 
 import com.aideai.AideAI;
 import com.aideai.config.ModConfig;
+import com.aideai.entity.AideAIEntity;
 import com.aideai.network.AIApiClient;
-import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.damagesource.DamageSource;
+import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
-import net.minecraft.server.level.ServerPlayer;
+import net.neoforged.neoforge.event.ServerChatEvent;
+import net.minecraft.client.Minecraft;
 
 public class AIEventManager {
     private int tickCounter = 0;
@@ -21,7 +22,7 @@ public class AIEventManager {
             
             new Thread(() -> {
                 String response = AIApiClient.sendMessage("Player died, generate a funny respawn message");
-                Minecraft.getInstance().execute(() -> {
+                player.getServer().execute(() -> {
                     player.sendSystemMessage(Component.literal("[AideAI] " + response));
                     String command = AIApiClient.extractCommand(response);
                     if (command != null) {
@@ -34,6 +35,17 @@ public class AIEventManager {
     }
 
     @SubscribeEvent
+    public void onServerChat(ServerChatEvent event) {
+        ServerPlayer player = event.getPlayer();
+        String message = event.getMessage().getString();
+        
+        // Find nearby AideAI entity and make it respond
+        player.serverLevel().getEntitiesOfClass(AideAIEntity.class, 
+            player.getBoundingBox().inflate(20.0D))
+            .forEach(entity -> entity.onPlayerChat(player, message));
+    }
+
+    @SubscribeEvent
     public void onClientTick(ClientTickEvent.Post event) {
         if (!ModConfig.CLIENT.autoChatEnabled.get()) return;
         
@@ -41,7 +53,7 @@ public class AIEventManager {
         if (minecraft.player == null || minecraft.screen != null) return;
         
         tickCounter++;
-        if (tickCounter < 6000) return;  // 6000 ticks = ~5 minutes
+        if (tickCounter < 6000) return;
         tickCounter = 0;
         
         new Thread(() -> {
