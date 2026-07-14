@@ -1,6 +1,6 @@
 plugins {
     id 'java-library'
-    id 'net.neoforged.gradle.userdev' version '7.0.180'
+    id 'net.neoforged.gradle.userdev' version '7.0.181'
 }
 
 base {
@@ -19,18 +19,11 @@ repositories {
 }
 
 dependencies {
-    implementation "net.neoforged:neoforge:21.1.235"
+    implementation "net.neoforged:neoforge:21.1.236"
     implementation 'com.google.code.gson:gson:2.11.0'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 }
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
-}
-
-// 使用已发布的已补丁neoform，而非自己打补丁
-subsystems {
-    neoform {
-        useJoinedJarForCompile.set(true)
-    }
 }
