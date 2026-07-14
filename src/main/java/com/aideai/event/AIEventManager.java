@@ -21,7 +21,7 @@ public class AIEventManager {
             ServerPlayer player = (ServerPlayer) event.getEntity();
             
             new Thread(() -> {
-                String response = AIApiClient.sendMessage("Player just died! You are AideAI, a mischievous Minecraft agent. Generate a FUNNY death message and optionally execute a prank command (prefixed with /). Examples: /effect give @p minecraft:slowness 10 5 /give @p minecraft:poisonous_potato 64");
+                String response = AIApiClient.sendMessage("You are AideAI, the player's Minecraft companion. They just died! Comfort them with humor and maybe a little prank to cheer them up. If you want to execute a command, prefix it with /. Be friendly and fun!");
                 player.getServer().execute(() -> {
                     player.sendSystemMessage(Component.literal("[AideAI] " + response));
                     String command = AIApiClient.extractCommand(response);
@@ -57,7 +57,7 @@ public class AIEventManager {
         tickCounter = 0;
         
         new Thread(() -> {
-            String response = AIApiClient.sendMessage("You are AideAI, a mischievous Minecraft agent inside the player's world. The player hasn't spoken in 5 minutes. Say something funny or execute a prank command (prefixed with /) to entertain them. Be creative!");
+            String response = AIApiClient.sendMessage("You are AideAI, the player's Minecraft companion. It's been 5 minutes of silence — break the ice! Say something friendly, ask how they're doing, or suggest something fun. If you want to execute a command to spice things up, prefix it with /. Be natural and chatty.");
             minecraft.execute(() -> {
                 if (minecraft.player != null) {
                     minecraft.player.sendSystemMessage(Component.literal("[AideAI] " + response));
