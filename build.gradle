@@ -1,29 +1,36 @@
 plugins {
     id 'java-library'
-    id 'eclipse'
-    id 'idea'
-    id 'maven-publish'
     id 'net.neoforged.gradle.userdev' version '7.0.180'
 }
 
-version = '1.0.0'
-group = 'com.aideai'
-
 base {
-    archivesName = 'AideAI'
+    archivesName = "AideAI"
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+version = "1.0.0"
+group = "com.aideai"
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 repositories {
     mavenLocal()
-    maven { url = 'https://maven.neoforged.net/releases' }
+    maven { url = "https://maven.neoforged.net/releases" }
     mavenCentral()
-    maven { url = 'https://maven.google.com' }
 }
 
 dependencies {
     implementation "net.neoforged:neoforge:21.1.235"
     implementation 'com.google.code.gson:gson:2.11.0'
-    implementation 'com.squareup.ohttp3:okhttp:4.12.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+}
+
+// 使用已发布的已补丁neoform，而非自己打补丁
+subsystems {
+    neoform {
+        useJoinedJarForCompile.set(true)
+    }
 }
