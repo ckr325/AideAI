@@ -1,12 +1,14 @@
 package com.aideai.command;
 
 import com.aideai.config.ModConfig;
+import com.aideai.network.AIApiClient;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
+import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
-
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.bus.api.SubscribeEvent;
 
@@ -17,6 +19,29 @@ public class AideAICommand {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
         
         dispatcher.register(Commands.literal("aideai")
+            .then(Commands.literal("chat")
+                .then(Commands.argument("message", StringArgumentType.greedyString())
+                    .executes(ctx -> {
+                        String message = StringArgumentType.getString(ctx, "message");
+                        CommandSourceStack source = ctx.getSource();
+                        
+                        new Thread(() -> {
+                            String response = AIApiClient.sendMessage(message);
+                            Minecraft.getInstance().execute(() -> {
+                                source.sendSuccess(() -> Component.literal("[AideAI] " + response), true);
+                                String command = AIApiClient.extractCommand(response);
+                                if (command != null && source.getEntity() instanceof ServerPlayer) {
+                                    ServerPlayer player = (ServerPlayer) source.getEntity();
+                                    player.getServer().getCommands().performPrefixedCommand(
+                                        player.createCommandSourceStack(), command);
+                                }
+                            });
+                        }).start();
+                        
+                        return 1;
+                    })
+                )
+            )
             .then(Commands.literal("setkey")
                 .then(Commands.argument("key", StringArgumentType.greedyString())
                     .executes(ctx -> {
@@ -52,6 +77,7 @@ public class AideAICommand {
                 .executes(ctx -> {
                     ctx.getSource().sendSuccess(() -> Component.literal(
                         "=== AideAI Help ===\n" +
+                        "/aideai chat <msg>   - Chat with AI\n" +
                         "/aideai setkey <key>  - Set API Key\n" +
                         "/aideai seturl <url>  - Set API URL\n" +
                         "/aideai toggle        - Toggle auto chat\n" +
