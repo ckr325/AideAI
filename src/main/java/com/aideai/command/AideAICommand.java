@@ -13,7 +13,6 @@ import net.neoforged.bus.api.SubscribeEvent;
 
 public class AideAICommand {
     
-    @SubscribeEvent
     public void onRegisterCommands(RegisterCommandsEvent event) {
         CommandDispatcher<CommandSourceStack> dispatcher = event.getDispatcher();
         

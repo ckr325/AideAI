@@ -6,6 +6,7 @@ import com.aideai.event.AIEventManager;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,6 +20,8 @@ public class AideAI {
         
         ModConfig.init();
         NeoForge.EVENT_BUS.register(new AIEventManager());
-        NeoForge.EVENT_BUS.register(new AideAICommand());
+        
+        AideAICommand commandHandler = new AideAICommand();
+        NeoForge.EVENT_BUS.addListener(RegisterCommandsEvent.class, commandHandler::onRegisterCommands);
     }
 }
