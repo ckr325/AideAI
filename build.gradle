@@ -17,7 +17,6 @@ repositories {
 }
 
 dependencies {
-    // universal jar 包含映射后的 Minecraft + NeoForge 类
     compileOnly "net.neoforged:neoforge:21.1.236:universal"
     
     implementation 'com.google.code.gson:gson:2.11.0'
@@ -26,4 +25,12 @@ dependencies {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
+}
+
+// 把Gson和OkHttp打包进jar
+jar {
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
