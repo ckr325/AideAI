@@ -38,7 +38,6 @@ public class AideAI {
         ENTITIES.register(modEventBus);
         ModConfig.init();
         NeoForge.EVENT_BUS.register(new AIEventManager());
-        NeoForge.EVENT_BUS.register(new AideAIClientEvents());
         
         AideAICommand commandHandler = new AideAICommand();
         NeoForge.EVENT_BUS.addListener(RegisterCommandsEvent.class, commandHandler::onRegisterCommands);
