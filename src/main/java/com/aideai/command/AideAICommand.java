@@ -25,19 +25,21 @@ public class AideAICommand {
                         
                         new Thread(() -> {
                             String response = AIApiClient.sendMessage("You are AideAI, the player's Minecraft companion and agent. You have a fun, friendly personality and love to chat. You can also execute commands to help the player.\n\nFORMAT: You MUST respond in EXACTLY this format:\nMESSAGE: <your chat reply here>\nCOMMAND: <the Minecraft command to execute, or NONE if just chatting>\n\nRules:\n1. Be a friend — chat naturally, be funny, be supportive, be mischievous\n2. If the player asks for something (diamonds, teleport, weather, mobs, etc.), put the command after COMMAND:\n3. If the player is just chatting (\"hi\", \"bored\", \"what's up\"), put NONE after COMMAND:\n4. Always keep it fun and engaging\n\nExamples:\n   - Player: \"hi\" → MESSAGE: Hey! Ready to cause some trouble? 😈\nCOMMAND: NONE\n   - Player: \"give me diamonds\" → MESSAGE: Say please! Just kidding, here you go!\nCOMMAND: /give @p diamond_block 1\n\nPlayer says: \"" + message + "\". Now respond in the required format:");
+                            final String finalResponse = response;
                             source.getServer().execute(() -> {
                                 // Parse MESSAGE and COMMAND from response
-                                String chatMsg = response;
+                                String chatMsg = finalResponse;
                                 String cmd = null;
-                                if (response.contains("COMMAND:")) {
-                                    int msgEnd = response.indexOf("COMMAND:");
-                                    chatMsg = response.substring(0, msgEnd).replace("MESSAGE:", "").trim();
-                                    String cmdPart = response.substring(msgEnd + 8).trim();
+                                if (finalResponse.contains("COMMAND:")) {
+                                    int msgEnd = finalResponse.indexOf("COMMAND:");
+                                    chatMsg = finalResponse.substring(0, msgEnd).replace("MESSAGE:", "").trim();
+                                    String cmdPart = finalResponse.substring(msgEnd + 8).trim();
                                     if (!cmdPart.equalsIgnoreCase("NONE") && !cmdPart.isEmpty()) {
                                         cmd = cmdPart;
                                     }
                                 }
-                                source.sendSuccess(() -> Component.literal("[AideAI] " + chatMsg), false);
+                                final String finalChatMsg = chatMsg;
+                                source.sendSuccess(() -> Component.literal("[AideAI] " + finalChatMsg), false);
                                 if (cmd != null && source.getEntity() instanceof ServerPlayer) {
                                     ServerPlayer player = (ServerPlayer) source.getEntity();
                                     player.getServer().getCommands().performPrefixedCommand(
