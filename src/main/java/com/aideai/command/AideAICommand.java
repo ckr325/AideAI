@@ -4,7 +4,6 @@ import com.aideai.config.ModConfig;
 import com.aideai.network.AIApiClient;
 import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
-import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.chat.Component;
@@ -27,7 +26,7 @@ public class AideAICommand {
                         
                         new Thread(() -> {
                             String response = AIApiClient.sendMessage(message);
-                            Minecraft.getInstance().execute(() -> {
+                            source.getServer().execute(() -> {
                                 source.sendSuccess(() -> Component.literal("[AideAI] " + response), true);
                                 String command = AIApiClient.extractCommand(response);
                                 if (command != null && source.getEntity() instanceof ServerPlayer) {
