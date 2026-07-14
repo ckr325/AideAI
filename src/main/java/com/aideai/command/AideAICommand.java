@@ -24,7 +24,7 @@ public class AideAICommand {
                         CommandSourceStack source = ctx.getSource();
                         
                         new Thread(() -> {
-                            String response = AIApiClient.sendMessage(message);
+                            String response = AIApiClient.sendMessage("You are AideAI, an intelligent agent inside Minecraft. Your job is to understand what the player wants and execute Minecraft commands to fulfill their wishes.\n\nRules:\n1. Analyze the player's intent and figure out the best Minecraft command(s) to achieve it\n2. Always include the command in your response prefixed with /\n3. Keep your reply short and natural, but make sure the command is there\n\nPlayer says: \"" + message + "\". Respond with a short message + the command:");
                             source.getServer().execute(() -> {
                                 source.sendSuccess(() -> Component.literal("[AideAI] " + response), true);
                                 String command = AIApiClient.extractCommand(response);

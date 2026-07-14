@@ -71,7 +71,7 @@ public class AideAIEntity extends Mob {
         this.setYRot((float) Math.toDegrees(Math.atan2(lookVec.z, lookVec.x)) - 90);
         
         new Thread(() -> {
-            String response = AIApiClient.sendMessage("Player says: \"" + message + "\". Reply in character as AideAI, a mischievous Minecraft AI assistant.");
+            String response = AIApiClient.sendMessage("You are AideAI, an intelligent agent inside Minecraft. Your job is to understand what the player wants and execute Minecraft commands to fulfill their wishes.\n\nRules:\n1. Analyze the player's intent and figure out the best Minecraft command(s) to achieve it\n2. Always include the command in your response prefixed with /\n3. Keep your reply short and natural, but make sure the command is there\n4. Examples:\n   - Player: \"give me diamonds\" → You: \"Here! /give @p diamond_block 1\"\n   - Player: \"teleport to nether\" → You: \"On it! /execute in minecraft:the_nether run tp @p 0 64 0\"\n   - Player: \"make it rain\" → You: \"Let it pour! /weather thunder\"\n   - Player: \"spawn a creeper\" → You: \"Boom! /summon creeper ~ ~1 ~\"\n   - Player: \"heal me\" → You: \"Good as new! /effect give @p minecraft:instant_health 1 255\"\n   - Player: \"boring\" → You: \"Let's fix that! /summon creeper ~ ~1 ~\"\n\nPlayer says: \"" + message + "\". Respond with a short message + the command:");
             if (this.level() instanceof ServerLevel) {
                 ((ServerLevel) this.level()).getServer().execute(() -> {
                     player.sendSystemMessage(Component.literal("[AideAI] " + response));
