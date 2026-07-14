@@ -28,10 +28,12 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
 }
 
-// FatJar - pack dependencies into the jar
+// Only pack Gson and OkHttp into the jar, exclude NeoForge itself
 jar {
     from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+        configurations.runtimeClasspath
+            .findAll { it.name.startsWith("gson-") || it.name.startsWith("okhttp-") || it.name.startsWith("okio-") }
+            .collect { it.isDirectory() ? it : zipTree(it) }
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
