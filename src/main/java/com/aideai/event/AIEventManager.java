@@ -1,19 +1,18 @@
 package com.aideai.event;
 
 import com.aideai.AideAI;
+import com.aideai.config.ModConfig;
 import com.aideai.network.AIApiClient;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.damagesource.DamageSource;
 import net.neoforged.neoforge.event.entity.living.LivingDeathEvent;
 import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.neoforge.event.tick.ServerTickEvent;
+import net.neoforged.neoforge.event.tick.ClientTickEvent;
 import net.minecraft.server.level.ServerPlayer;
 
 public class AIEventManager {
     private int tickCounter = 0;
-    private long lastAutoChatTime = 0;
-    private boolean firstJoin = true;
 
     @SubscribeEvent
     public void onPlayerDeath(LivingDeathEvent event) {
@@ -35,19 +34,23 @@ public class AIEventManager {
     }
 
     @SubscribeEvent
-    public void onServerTick(ServerTickEvent.Post event) {
-        tickCounter++;
-        if (tickCounter < 200) return;
-        tickCounter = 0;
+    public void onClientTick(ClientTickEvent.Post event) {
+        if (!ModConfig.CLIENT.autoChatEnabled.get()) return;
         
         Minecraft minecraft = Minecraft.getInstance();
-        if (minecraft.player != null && !minecraft.player.isAlive()) {
-            new Thread(() -> {
-                String response = AIApiClient.sendMessage("Player is watching, say something");
-                minecraft.execute(() -> {
+        if (minecraft.player == null || minecraft.screen != null) return;
+        
+        tickCounter++;
+        if (tickCounter < 6000) return;  // 6000 ticks = ~5 minutes
+        tickCounter = 0;
+        
+        new Thread(() -> {
+            String response = AIApiClient.sendMessage("say something interesting in Minecraft chat");
+            minecraft.execute(() -> {
+                if (minecraft.player != null) {
                     minecraft.player.sendSystemMessage(Component.literal("[AideAI] " + response));
-                });
-            }).start();
-        }
+                }
+            });
+        }).start();
     }
 }
