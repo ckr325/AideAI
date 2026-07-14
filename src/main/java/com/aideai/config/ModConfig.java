@@ -1,7 +1,7 @@
 package com.aideai.config;
 
 import net.neoforged.fml.ModLoadingContext;
-import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.config.ModConfig.Type;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class ModConfig {
@@ -36,6 +36,6 @@ public class ModConfig {
     }
     
     public static void init() {
-        ModLoadingContext.get().registerConfig(ModConfig.Type.CLIENT, CLIENT_SPEC, "aideai-client.toml");
+        ModLoadingContext.get().getActiveContainer().registerConfig(Type.CLIENT, CLIENT_SPEC, "aideai-client.toml");
     }
 }
