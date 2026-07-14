@@ -28,11 +28,11 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = "UTF-8"
 }
 
-// Only pack Gson and OkHttp into the jar, exclude NeoForge itself
+// Only pack OkHttp+Okio into the jar (Gson is already provided by Minecraft)
 jar {
     from {
         configurations.runtimeClasspath
-            .findAll { it.name.startsWith("gson-") || it.name.startsWith("okhttp-") || it.name.startsWith("okio-") }
+            .findAll { it.name.startsWith("okhttp-") || it.name.startsWith("okio-") }
             .collect { it.isDirectory() ? it : zipTree(it) }
     }
     duplicatesStrategy = DuplicatesStrategy.EXCLUDE
