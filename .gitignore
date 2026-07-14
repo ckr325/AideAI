@@ -1,0 +1,11 @@
+build/
+.gradle/
+*.class
+*.jar
+*.log
+*.iml
+.idea/
+eclipse/
+run/
+out/
+gradle-8.10-bin.zip

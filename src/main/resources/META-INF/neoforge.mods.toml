@@ -1,0 +1,33 @@
+modLoader="javafml"
+loaderVersion="[4,)"
+license="MIT"
+
+[[mods]]
+modId="aideai"
+version="1.0.0"
+displayName="AideAI"
+credits="AideAI Team"
+authors="AideAI"
+description='''
+AideAI - Minecraft It语设伴侣模廸
+
+功能：
+- 捈分 H 门打开AI英论畉
+- AI可听执行Minecraft指官切定
+-自劣语设读功
+- 整棋模式（AI而区术萝莉≋继续和化别的生派）
+'''
+
+[[dependencies.aideai]]
+modId="neoforge"
+mandatory=true
+versionRange="[21,)"
+ordering="NONE"
+side="BOTH 
+
+[[dependencies.aideai]]
+modId="minecraft"
+mandatory=true
+versionRange="[1.21.1,1.21.2)"
+ordering="NONE"
+side="BOTH 

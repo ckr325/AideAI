@@ -1,0 +1,29 @@
+plugins {
+    id 'java-library'
+    id 'eclipse'
+    id 'idea'
+    id 'maven-publish'
+    id 'net.neoforged.gradle.userdev' version '7.0.180'
+}
+
+version = '1.0.0'
+group = 'com.aideai'
+
+base {
+    archivesName = 'AideAI'
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+
+repositories {
+    mavenLocal()
+    maven { url = 'https://maven.neoforged.net/releases' }
+    mavenCentral()
+    maven { url = 'https://maven.google.com' }
+}
+
+dependencies {
+    implementation "net.neoforged:neoforge:21.1.235"
+    implementation 'com.google.code.gson:gson:2.11.0'
+    implementation 'com.squareup.ohttp3:okhttp:4.12.0'
+}
