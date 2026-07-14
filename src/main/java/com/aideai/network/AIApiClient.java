@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-public class AIapiClient {
+public class AIApiClient {
     private static final String BASE_URL = "https://api.deepseek.com/v1/chat/completions";
     private static OkHttpClient client = new OkHttpClient.Builder()
         .connectTimeout(30, TimeUnit.SECONDS)
@@ -24,7 +24,7 @@ public class AIapiClient {
     public static String sendMessage(String userMessage) {
         String apiKey = ModConfig.CLIENT.apiKey.get();
         if (apiKey.isEmpty()) {
-            return "\u007c[错语] 请先设置 API Key: /aideai setkey <yourmySomekey>";
+            return "[Error] Please set API Key first: /aideai setkey <your-api-key>";
         }
 
         JsonObject requestBody = new JsonObject();
@@ -33,7 +33,7 @@ public class AIapiClient {
         JsonArray messages = new JsonArray();
         JsonObject systemMsg = new JsonObject();
         systemMsg.addProperty("role", "system");
-        systemMsg.addProperty("content", "你是一个Minecraft全局作創易限，名为AideAI。你可情安下放词。可输出意行意前，也以参数易限控刷。");
+        systemMsg.addProperty("content", "You are a Minecraft assistant named AideAI. Be helpful and concise.");
         messages.add(systemMsg);
 
         JsonObject userMsg = new JsonObject();
@@ -54,7 +54,7 @@ public class AIapiClient {
 
         try (Response response = client.newCall(request).execute()) {
             if (!response.isSuccessful()) {
-                return "\u007c[错语] API读求失败： " + response.code();
+                return "[Error] API request failed: " + response.code();
             }
 
             String responseBody = response.body() != null ? response.body().string() : "";
@@ -65,10 +65,10 @@ public class AIapiClient {
                     .get("message").getAsJsonObject()
                     .get("content").getAsString();
             }
-            return "\u007e[AideAI] AI没&spos;返回内宸？";
+            return "[AideAI] AI returned empty response?";
         } catch (IOException e) {
-            AideAI.LOGGER.error("API错误地址错误", e);
-            return "\u007c[错语] API错误失败： " + e.getMessage();
+            AideAI.LOGGER.error("API error", e);
+            return "[Error] API request failed: " + e.getMessage();
         }
     }
 
