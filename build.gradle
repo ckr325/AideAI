@@ -1,6 +1,5 @@
 plugins {
     id 'java-library'
-    id 'net.neoforged.gradle.userdev' version '7.0.181'
 }
 
 base {
@@ -13,13 +12,14 @@ group = "com.aideai"
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
 repositories {
-    mavenLocal()
-    maven { url = "https://maven.neoforged.net/releases" }
     mavenCentral()
+    maven { url = "https://maven.neoforged.net/releases" }
 }
 
 dependencies {
-    implementation "net.neoforged:neoforge:21.1.236"
+    // universal jar 包含映射后的 Minecraft + NeoForge 类
+    compileOnly "net.neoforged:neoforge:21.1.236:universal"
+    
     implementation 'com.google.code.gson:gson:2.11.0'
     implementation 'com.squareup.okhttp3:okhttp:4.12.0'
 }
