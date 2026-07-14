@@ -9,13 +9,13 @@ displayName="AideAI"
 credits="AideAI Team"
 authors="AideAI"
 description='''
-AideAI - Minecraft It语设伴侣模廸
+AideAI - Minecraft AI Chat Assistant Mod
 
-功能：
-- 捈分 H 门打开AI英论畉
-- AI可听执行Minecraft指官切定
--自劣语设读功
-- 整棋模式（AI而区术萝莉≋继续和化别的生派）
+Features:
+- Auto-reply to chat messages using AI API
+- Support for OpenAI-compatible API endpoints
+- Configurable via /aideai commands
+- Toggle on/off at any time
 '''
 
 [[dependencies.aideai]]
@@ -23,11 +23,11 @@ modId="neoforge"
 mandatory=true
 versionRange="[21,)"
 ordering="NONE"
-side="BOTH 
+side="BOTH"
 
 [[dependencies.aideai]]
 modId="minecraft"
 mandatory=true
 versionRange="[1.21.1,1.21.2)"
 ordering="NONE"
-side="BOTH 
+side="BOTH"
