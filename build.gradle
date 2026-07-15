@@ -12,6 +12,12 @@ group = "com.aideai"
 
 java.toolchain.languageVersion = JavaLanguageVersion.of(21)
 
+subsystems {
+    neoform {
+        useJoinedJarForCompile = true
+    }
+}
+
 repositories {
     mavenLocal()
     maven { url = "https://maven.neoforged.net/releases" }
