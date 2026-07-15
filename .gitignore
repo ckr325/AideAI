@@ -1,7 +1,7 @@
 build/
 .gradle/
 *.class
-*.jar
+# *.jar  (移除jar全局排除，gradle-wrapper需要被追踪)
 *.log
 *.iml
 .idea/
