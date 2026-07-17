@@ -1,0 +1,10 @@
+{
+    "item.aideai.example": "AideAI 模组",
+    "key.aideai.open_chat": "打开AI聊天",
+    "screen.aideai.chat": "AI 对话",
+    "config.aideai.title": "AideAI 配置",
+    "config.aideai.api_key": "API 密钥",
+    "config.aideai.model": "模型",
+    "config.aideai.temperature": "温度",
+    "config.aideai.max_tokens": "最大Token数"
+}
