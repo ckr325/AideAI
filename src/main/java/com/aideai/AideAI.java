@@ -97,11 +97,11 @@ public class AideAI {
 
     // ========== 实体生成逻辑 ==========
     
-    // 监听玩家进入世界事件（在服务端触发）
+    // 监听玩家进入世界事件（只在服务端生成，自动同步到客户端）
     @SubscribeEvent
     public void onEntityJoinLevel(EntityJoinLevelEvent event) {
         if (event.getLevel().isClientSide) return; // 只在服务端执行
-        if (!(event.getEntity() instanceof Player player)) return; // 只对玩家触发
+        if (!(event.getEntity() instanceof Player player)) return;
         
         // 避免重复生成
         if (aiEntityInstance != null && aiEntityInstance.isAlive()) return;
