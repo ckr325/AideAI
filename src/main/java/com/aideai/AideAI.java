@@ -112,8 +112,8 @@ public class AideAI {
             }
         }
         
-        // 附近实体数（粗略统计玩家附近生物）
-        int nearbyEntities = level.getEntities().size();
+        // 附近实体数（统计玩家附近32格内的生物）
+        int nearbyEntities = level.getEntities(player, player.getBoundingBox().inflate(32)).size();
         
         // 状态效果
         String effects = "";
