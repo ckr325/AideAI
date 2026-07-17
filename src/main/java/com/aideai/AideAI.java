@@ -86,8 +86,6 @@ public class AideAI {
     private void onClientSetup(final FMLClientSetupEvent event) {
         LOGGER.info("AideAI 客户端设置完成 - 已劫持聊天输入，单人模式AI对话");
         
-        entitySpawned = false;
-        
         // 启动自动触发检查任务（每10秒检查一次）
         scheduler.scheduleAtFixedRate(AideAI::checkAutoTrigger, 30, 10, TimeUnit.SECONDS);
         // 启动上下文更新任务（每5秒刷新）
