@@ -230,10 +230,10 @@ public class AideAI {
         String timeFeel = dayTime < 6000 ? "清晨" : dayTime < 13000 ? "白天" : dayTime < 18000 ? "黄昏" : "深夜";
         
         cachedGameContext = String.format(
-            "【小染的视角】现在是%s，你在%s的%s。你%s，%s，%s。%s。%s%s",
-            timeFeel, dimName, locationDesc, handDesc, statusDesc, 
-            hunger <= 6 ? "肚子饿得咕咕叫了" : "不饿",
-            nearbyDesc, effects.isEmpty() ? "" : "你身上有" + effects + "的效果", 
+            "[小染看到的] 现在是%s，主人在%s的%s。主人%s，%s，%s。%s。%s%s",
+            timeFeel, dimName, locationDesc, handDesc, statusDesc,
+            hunger <= 6 ? "肚子饿得咕咕叫了" : "看起来不饿",
+            nearbyDesc, effects.isEmpty() ? "" : "主人身上有" + effects + "的效果",
             fallInfo
         );
         
@@ -265,7 +265,7 @@ public class AideAI {
         
         if (probability > 0 && Math.random() < probability) {
             String context = getGameContext();
-            String prompt = "(你已经盯着主人的背影看了" + minutes + "分钟了，心里有点不是滋味。他完全没注意到你。你深吸一口气，决定主动叫他一声...)\n\n" + context + "\n\n（小染的内心：开口说句话吧，就像平时那样自然地叫他）";
+            String prompt = context + "\n\n（小染已经盯着主人看了" + minutes + "分钟了，心里有点不是滋味。主人完全没注意到她。她深吸一口气，决定主动说句话...）\n\n[小染对主人说]";
             DeepSeekClient.sendMessage(prompt).thenAccept(reply -> {
                 if (reply != null && mc.player != null) {
                     String cleanReply = reply.replaceAll("\\[指令\\].*?(\\n|$)", "").trim();
@@ -305,8 +305,8 @@ public class AideAI {
         Minecraft.getInstance().player.displayClientMessage(
             Component.literal("§e你: " + message), false);
         
-        // 发送给AI，自动携带游戏上下文 —— 用自然视角包裹
-        String enhancedMessage = context + "\n\n" + message;
+        // 发送给AI —— 明确区分"小染看到的"和"主人说的话"
+        String enhancedMessage = context + "\n\n[主人对小染说] " + message;
         DeepSeekClient.sendMessage(enhancedMessage).thenAccept(reply -> {
             if (reply != null) {
                 // 执行AI回复中的指令
