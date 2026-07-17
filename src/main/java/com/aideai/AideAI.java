@@ -63,6 +63,8 @@ public class AideAI {
         
         // 注册实体属性（通用阶段，非客户端）
         modEventBus.addListener(this::registerEntityAttributes);
+        // 注册实体渲染器（IModBusEvent，必须用 modEventBus）
+        modEventBus.addListener(this::onRegisterRenderers);
         
         modEventBus.addListener(this::onClientSetup);
         modContainer.registerExtensionPoint(IConfigScreenFactory.class, 
@@ -76,9 +78,8 @@ public class AideAI {
         event.put(ModEntities.AI_ENTITY.get(), AIEntity.createAttributes().build());
     }
 
-    // 注册实体渲染器
-    @SubscribeEvent
-    public void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
+    // 注册实体渲染器（IModBusEvent，必须用 modEventBus 注册）
+    private void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntities.AI_ENTITY.get(), 
             com.aideai.entity.client.AIEntityRenderer::new);
     }
