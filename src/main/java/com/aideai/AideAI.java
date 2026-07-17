@@ -130,11 +130,56 @@ public class AideAI {
         boolean isFalling = !player.onGround() && player.fallDistance > 0.5;
         String fallInfo = isFalling ? "，正在掉落中！" : "";
         
+        // ====== 转换成有话题感的自然描述 ======
+        // 1. 地点描述
+        String locationDesc;
+        if (biome.contains("ocean") || biome.contains("river")) locationDesc = "一片水域旁";
+        else if (biome.contains("plains") || biome.contains("forest") || biome.contains("taiga")) locationDesc = "一片开阔的野外";
+        else if (biome.contains("desert")) locationDesc = "干旱的沙漠里";
+        else if (biome.contains("mountain") || biome.contains("hills")) locationDesc = "山地上";
+        else if (biome.contains("swamp")) locationDesc = "潮湿的沼泽里";
+        else if (biome.contains("jungle")) locationDesc = "茂密的丛林里";
+        else if (biome.contains("snow") || biome.contains("ice")) locationDesc = "冰雪覆盖的地方";
+        else if (biome.contains("cave") || biome.contains("deep")) locationDesc = "幽深的地下洞穴中";
+        else if (biome.contains("nether") || biome.contains("hell")) locationDesc = "炽热的下界";
+        else if (biome.contains("end")) locationDesc = "虚无的末地";
+        else locationDesc = biome.contains(":") ? biome.split(":")[1].replace("_", " ") : biome;
+        
+        // 2. 主人近况描述
+        String statusDesc;
+        if (health <= 4) statusDesc = "伤势很重，生命垂危！";
+        else if (health <= 8) statusDesc = "受了些伤，需要休息";
+        else if (hunger <= 6) statusDesc = "肚子饿了，需要吃点东西";
+        else if (health == maxHealth && hunger >= 18) statusDesc = "状态很好，精神饱满";
+        else if (isFalling) statusDesc = "正在从高处掉落！";
+        else statusDesc = "状态还不错";
+        
+        // 3. 手持物品的自然描述
+        String handDesc;
+        if (mainHand.isEmpty()) handDesc = "手里空空的";
+        else if (handItem.contains("剑") || handItem.contains("sword")) handDesc = "手里握着" + handItem + "，一副准备战斗的样子";
+        else if (handItem.contains("镐") || handItem.contains("pickaxe")) handDesc = "正拿着" + handItem + "，一看就是在挖矿";
+        else if (handItem.contains("斧") || handItem.contains("axe")) handDesc = "拎着" + handItem + "，像是在砍树";
+        else if (handItem.contains("弓") || handItem.contains("bow")) handDesc = "拿着" + handItem + "，准备远程射击";
+        else if (handItem.contains("食物") || handItem.contains("apple") || handItem.contains("bread")) handDesc = "拿着" + handItem + "，正要吃东西";
+        else handDesc = "手上拿着" + handItem;
+        
+        // 4. 附近情况
+        String nearbyDesc;
+        if (nearbyEntities > 20) nearbyDesc = "周围好热闹，有" + nearbyEntities + "个生物在你附近";
+        else if (nearbyEntities > 5) nearbyDesc = "附近有" + nearbyEntities + "个生物在活动";
+        else if (nearbyEntities > 0) nearbyDesc = "周围很安静，零星有几个生物";
+        else nearbyDesc = "附近空无一人，只有你";
+        
+        // 5. 时间感
+        String timeFeel = dayTime < 6000 ? "清晨" : dayTime < 13000 ? "白天" : dayTime < 18000 ? "黄昏" : "深夜";
+        
         cachedGameContext = String.format(
-            "【当前状态】你正在%s的%s，坐标(%d,%d,%d)，%s%s。血量%d/%d，饥饿值%d，经验值%d。手持%s，背包中有%d件工具/武器，%d件食物%s%s",
-            dimName, biome, pos.getX(), pos.getY(), pos.getZ(), timeStr, fallInfo,
-            health, maxHealth, hunger, xp, handItem, toolCount, foodCount, effects, 
-            nearbyEntities > 10 ? "，附近有" + nearbyEntities + "个实体" : ""
+            "【小染的视角】现在是%s，你在%s的%s。你%s，%s，%s。%s。%s%s",
+            timeFeel, dimName, locationDesc, handDesc, statusDesc, 
+            hunger <= 6 ? "肚子饿得咕咕叫了" : "不饿",
+            nearbyDesc, effects.isEmpty() ? "" : "你身上有" + effects + "的效果", 
+            fallInfo
         );
         
         lastContextUpdate = System.currentTimeMillis();
@@ -165,7 +210,7 @@ public class AideAI {
         
         if (probability > 0 && Math.random() < probability) {
             String context = getGameContext();
-            String prompt = "[系统提示：你已沉默" + minutes + "分钟了。当前游戏情况：" + context + "。作为病娇AI女友，根据当前游戏情况主动找主人说句话。注意：不要使用[指令]格式，只需要说一句符合你病娇人设的话]";
+            String prompt = "(你已经盯着主人的背影看了" + minutes + "分钟了，心里有点不是滋味。他完全没注意到你。你深吸一口气，决定主动叫他一声...)\n\n" + context + "\n\n（小染的内心：开口说句话吧，就像平时那样自然地叫他）";
             DeepSeekClient.sendMessage(prompt).thenAccept(reply -> {
                 if (reply != null && mc.player != null) {
                     String cleanReply = reply.replaceAll("\\[指令\\].*?(\\n|$)", "").trim();
@@ -205,8 +250,8 @@ public class AideAI {
         Minecraft.getInstance().player.displayClientMessage(
             Component.literal("§e你: " + message), false);
         
-        // 发送给AI，自动携带游戏上下文
-        String enhancedMessage = context + "\n" + message;
+        // 发送给AI，自动携带游戏上下文 —— 用自然视角包裹
+        String enhancedMessage = context + "\n\n" + message;
         DeepSeekClient.sendMessage(enhancedMessage).thenAccept(reply -> {
             if (reply != null) {
                 // 执行AI回复中的指令
