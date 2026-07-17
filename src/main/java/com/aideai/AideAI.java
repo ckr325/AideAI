@@ -1,6 +1,8 @@
 package com.aideai;
 
 import com.aideai.config.ModConfig;
+import com.aideai.entity.AIEntity;
+import com.aideai.entity.ModEntities;
 import com.aideai.network.DeepSeekClient;
 import com.mojang.logging.LogUtils;
 import net.neoforged.bus.api.IEventBus;
@@ -9,11 +11,17 @@ import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig.Type;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.neoforged.neoforge.client.event.ClientChatEvent;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.client.gui.IConfigScreenFactory;
+import net.neoforged.neoforge.event.entity.EntityAttributeCreationEvent;
+import net.neoforged.neoforge.event.entity.EntityJoinLevelEvent;
+import net.neoforged.neoforge.event.tick.LevelTickEvent;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.core.BlockPos;
@@ -41,10 +49,20 @@ public class AideAI {
     private static String cachedGameContext = "";
     private static long lastContextUpdate = 0;
 
+    // 实体跟踪
+    private static AIEntity aiEntityInstance = null;
+    private static boolean entitySpawned = false;
+
     public AideAI(IEventBus modEventBus, ModContainer modContainer) {
         LOGGER.info("AideAI 模组初始化...");
         
         modContainer.registerConfig(Type.COMMON, ModConfig.SPEC, "aideai.toml");
+        
+        // 注册实体类型
+        ModEntities.ENTITIES.register(modEventBus);
+        
+        // 注册实体属性（通用阶段，非客户端）
+        modEventBus.addListener(this::registerEntityAttributes);
         
         modEventBus.addListener(this::onClientSetup);
         modContainer.registerExtensionPoint(IConfigScreenFactory.class, 
@@ -53,12 +71,61 @@ public class AideAI {
         NeoForge.EVENT_BUS.register(this);
     }
 
+    // 注册实体属性
+    private void registerEntityAttributes(EntityAttributeCreationEvent event) {
+        event.put(ModEntities.AI_ENTITY.get(), AIEntity.createAttributes().build());
+    }
+
+    // 注册实体渲染器
+    @SubscribeEvent
+    public void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerEntityRenderer(ModEntities.AI_ENTITY.get(), 
+            com.aideai.entity.client.AIEntityRenderer::new);
+    }
+
     private void onClientSetup(final FMLClientSetupEvent event) {
         LOGGER.info("AideAI 客户端设置完成 - 已劫持聊天输入，单人模式AI对话");
+        
+        entitySpawned = false;
+        
         // 启动自动触发检查任务（每10秒检查一次）
         scheduler.scheduleAtFixedRate(AideAI::checkAutoTrigger, 30, 10, TimeUnit.SECONDS);
         // 启动上下文更新任务（每5秒刷新）
         scheduler.scheduleAtFixedRate(AideAI::updateGameContext, 5, 5, TimeUnit.SECONDS);
+        // 启动实体生成检查（每2秒检查一次）
+        scheduler.scheduleAtFixedRate(AideAI::checkAndSpawnEntity, 10, 2, TimeUnit.SECONDS);
+    }
+
+    // ========== 实体生成逻辑 ==========
+    
+    private static void checkAndSpawnEntity() {
+        Minecraft mc = Minecraft.getInstance();
+        if (mc.player == null || mc.level == null) return;
+        
+        if (!entitySpawned && !mc.level.isClientSide) {
+            // 只在服务端生成，自动同步到客户端
+            spawnAIEntity(mc.player, mc.level);
+        }
+    }
+    
+    private static void spawnAIEntity(Player player, Level level) {
+        if (level.isClientSide) return;
+        
+        // 检查实体是否已经存在
+        if (aiEntityInstance != null && aiEntityInstance.isAlive()) {
+            entitySpawned = true;
+            return;
+        }
+        
+        // 在玩家旁边生成实体
+        BlockPos spawnPos = player.blockPosition().offset(3, 0, 3);
+        AIEntity entity = new AIEntity(ModEntities.AI_ENTITY.get(), level);
+        entity.setPos(spawnPos.getX(), spawnPos.getY(), spawnPos.getZ());
+        level.addFreshEntity(entity);
+        aiEntityInstance = entity;
+        entitySpawned = true;
+        
+        LOGGER.info("小染已出现在世界中！");
     }
 
     // ========== 游戏上下文获取 ==========
