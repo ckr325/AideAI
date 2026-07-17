@@ -1,26 +1,29 @@
 package com.aideai.entity.client;
 
-import com.aideai.AideAI;
 import com.aideai.entity.AIEntity;
+import com.mojang.authlib.GameProfile;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.PlayerModel;
+import net.minecraft.client.model.geom.ModelLayers;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.client.renderer.entity.VillagerRenderer;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.player.PlayerRenderer;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.entity.npc.Villager;
+import net.minecraft.world.entity.LivingEntity;
+import org.jetbrains.annotations.NotNull;
 
-public class AIEntityRenderer extends VillagerRenderer {
+public class AIEntityRenderer extends LivingEntityRenderer<AIEntity, PlayerModel<AIEntity>> {
     
-    // 用村民纹理的基础上改色调 —— 这里先用村民原纹理
-    private static final ResourceLocation TEXTURE = 
-            ResourceLocation.withDefaultNamespace("textures/entity/villager/villager.png");
+    // 使用默认的玩家皮肤纹理（Alex 模型）
+    private static final ResourceLocation DEFAULT_SKIN = 
+            ResourceLocation.withDefaultNamespace("textures/entity/steve.png");
 
     public AIEntityRenderer(EntityRendererProvider.Context context) {
-        super(context);
-        // 可以给实体加个发光效果
-        this.shadowRadius = 0.5f;
+        super(context, new PlayerModel<>(context.bakeLayer(ModelLayers.PLAYER), false), 0.5f);
     }
 
     @Override
-    public ResourceLocation getTextureLocation(Villager entity) {
-        return TEXTURE;
+    public @NotNull ResourceLocation getTextureLocation(@NotNull AIEntity entity) {
+        return DEFAULT_SKIN;
     }
 }
